@@ -1,0 +1,119 @@
+-- (faut refaire la presentation pour le prof)
+-- INF3143 TP1 Session A16
+--
+-- FERJ04119308, Ferland, Jérémy: 
+--
+model TP1A16
+
+--types par énumération
+enum Sexe {F, M}
+
+-- classes auxiliaires
+class Date
+	attributes
+		annee : Integer
+		mois : Integer
+		jour : Integer
+	operations
+		estAvantStrict(date2 : Date) : Boolean =
+			annee>date2.annee or (annee = date2.annee and mois>date2.mois) or  (annee = date2.annee and mois=date2.mois and jour > date2.jour)
+
+end
+
+
+--classes de base
+class Client
+	attributes
+		noClient : Integer
+		prenomClient : String
+		nomClient : String
+		sexeClient : Sexe
+end
+
+
+class Commande
+	attributes
+		noCommande : Integer
+		dateCommande : Date
+end
+
+class ArticleHist
+	attributes
+		dateDebut : Date
+		dateFin : Date
+		prixUnitaire : Integer
+end
+
+class Article
+	attributes
+		codeArticle : String
+		nomArticle : String
+end
+
+
+--Associations
+association Passe between
+	Client [1] role client
+	Commande [*] role commandes
+end
+
+association Hisorise between
+	ArticleHist [1..*] role historiques
+	Article [1] role article
+end
+
+associationclass LigneCommande 
+	between
+		Commande [*] role commande
+		ArticleHist [1..*] role article
+	attributes
+		quantite : Integer
+		escompte : Real
+end
+	
+
+-- Constraints (faut les finir + historique (pas deux prix pareil de suite, date de fin = date d/but du prochain) + remettre les nom officiel)
+constraints
+
+-- class Client
+context Client
+inv noClientOK: noClient > 0
+inv nomClientOK: nomClient.size() > 0
+inv noClientUnique:  Client.allInstances().noClient -> isUnique(p|p)
+
+-- class Date
+context Date
+inv anneeOK: annee > 0 and annee <= 9999
+inv moisOK: mois < 13 and mois > 0 
+inv JourOk: jour > 0 and (((mois = 4 or mois = 6 or mois = 9 or mois = 11) and jour <= 30) or (mois <> 4 and mois <> 6 and mois <> 9 and mois <> 11 and mois <> 2 and jour <= 31) or (mois = 2 and annee div 4 <> 0 and jour <=28) or (mois = 2 and annee div 4 = 0 and jour <=29) )
+
+--Class Commande
+context Commande
+inv noCommandeOK: noCommande >0
+inv noCommandeUnique:  Commande.allInstances().noCommande-> isUnique(p|p)
+
+--Class Article
+context Article
+inv codeArticleOK: codeArticle.size() > 0
+inv nomArticleOK: nomArticle.size() > 0
+inv noArticleUnique:  Article.allInstances().nomArticle-> isUnique(p|p)
+
+--Class ArticleHist
+context ArticleHist
+inv dateCoherentes: dateDebut.estAvantStrict(dateFin)
+inv prixUnitaireOK: prixUnitaire > 0
+
+
+--Class Ligne de commande
+context LigneCommande
+inv quantiteOK: quantite > 0
+inv escompteOK: escompte > 0 and escompte < 1
+
+-- Constraints complexe
+--Class Article
+context Article
+inv historiquesSuccessifsDistincts: historiques -> sortedBy(dateDebut.annee.toString().concat(dateDebut.mois.toString()).concat(dateDebut.jour.toString())) -> notEmpty()
+
+-- ArticleHist.allInstances()  -> forAll (date|	 )
+-- inv structureHistoriqueOK -> notEmpty()
+--

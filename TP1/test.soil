@@ -1,0 +1,30 @@
+--
+-- INF3143 : TP1
+-- (c) 2016 Jérémy Ferland
+--
+--
+
+-- Types auxiliaires
+-- Type Date
+!new Date('date99991231')
+!@date20000110.annee := 9999
+!@date20000110.mois := 12
+!@date20000110.jour := 31
+
+
+-- Types de base
+-- Type Client
+!new Client('bob')
+!@bob.noClient := 1423
+!@bob.nomClient := 'Bob'
+!@bob.prenomClient := 'Bob'
+
+!new Commande('commande')
+!@commande.noClient := 1424
+!@commande.dateCommande := date99991231
+
+
+-- Associations
+-- Association Possede entre Client et Compte
+!insert (@bob,@george) into Passe
+
